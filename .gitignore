@@ -53,3 +53,5 @@ __pycache__/
 # pickup detector: downloaded YOLO models, and product photos (they can show shoppers' or staff's hands)
 *.pt
 /detector/products/
+# ...except the homepage's product video, which is an animation, not footage
+!/public/video/*.mp4
