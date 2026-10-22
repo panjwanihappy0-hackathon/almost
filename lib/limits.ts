@@ -11,6 +11,11 @@ export const MIN_STOP_SHARE = 0.1;
 // ...and its share of sales is less than this fraction of its share of stops.
 export const SALES_TO_STOPS_RATIO = 0.5;
 
+// The same rule for products: at least this share of all pickups...
+export const MIN_PICKUP_SHARE = 0.1;
+// ...and a share of sales under this fraction of its share of pickups: high interest, low conversion.
+export const SALES_TO_PICKUPS_RATIO = 0.5;
+
 export function formatMB(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

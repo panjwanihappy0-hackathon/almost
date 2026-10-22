@@ -1,0 +1,19 @@
+{
+  "note": "Sample catalog: replace with your real products. Every SKU must also be on its rack in rack-map.json. Reference photos for recognition go in detector/products/<SKU>/.",
+  "products": [
+    { "sku": "DNM-101", "rack": "R1", "name": "Slim indigo jeans", "colour": "Indigo", "hex": "#2b3f6c", "kind": "jeans", "price": 1999, "tagline": "Stretch denim that keeps its shape all day.", "details": ["98% cotton, 2% elastane", "Mid rise, slim leg", "Sizes 28 to 38"] },
+    { "sku": "DNM-102", "rack": "R1", "name": "Relaxed light-wash jeans", "colour": "Light wash", "hex": "#8fa8c8", "kind": "jeans", "price": 1799, "tagline": "Easy, straight and soft from the first wear.", "details": ["100% cotton", "Relaxed straight leg", "Sizes 28 to 38"] },
+    { "sku": "DNM-103", "rack": "R1", "name": "Black skinny jeans", "colour": "Black", "hex": "#1d1f24", "kind": "jeans", "price": 1999, "tagline": "A deep black that won't fade to grey.", "details": ["Colour-lock dye", "High rise, skinny leg", "Sizes 26 to 36"] },
+    { "sku": "NEW-201", "rack": "R2", "name": "Linen camp shirt", "colour": "Sage green", "hex": "#8fae8b", "kind": "shirt", "price": 1599, "tagline": "Breathable linen for the hottest days.", "details": ["100% linen", "Camp collar, boxy fit", "Sizes S to XXL"] },
+    { "sku": "NEW-202", "rack": "R2", "name": "Oversized graphic tee", "colour": "Off white", "hex": "#ece6d8", "kind": "tee", "price": 899, "tagline": "Heavy cotton, dropped shoulders, new print.", "details": ["240 gsm cotton", "Oversized fit", "Sizes S to XXL"] },
+    { "sku": "NEW-203", "rack": "R2", "name": "Cropped utility jacket", "colour": "Olive", "hex": "#5b6236", "kind": "jacket", "price": 2999, "tagline": "Four pockets and a cropped cut for layering.", "details": ["Cotton twill", "Cropped, boxy fit", "Sizes S to XL"] },
+    { "sku": "KRT-301", "rack": "R3", "name": "Cotton straight kurta", "colour": "Mustard", "hex": "#d4a72c", "kind": "kurta", "price": 1299, "tagline": "Everyday kurta in soft, breathable cotton.", "details": ["100% cotton", "Straight cut, calf length", "Sizes XS to XXL"] },
+    { "sku": "KRT-302", "rack": "R3", "name": "Block-print kurta", "colour": "Indigo print", "hex": "#34497a", "kind": "kurta", "price": 1499, "tagline": "Hand block-printed by artisans in Bagru.", "details": ["Hand block print", "A-line, knee length", "Sizes XS to XXL"] },
+    { "sku": "KRT-303", "rack": "R3", "name": "Chikankari kurta", "colour": "White", "hex": "#f2f0ea", "kind": "kurta", "price": 1999, "tagline": "Lucknowi hand embroidery on fine cotton.", "details": ["Hand embroidered", "Straight cut, calf length", "Sizes XS to XXL"] },
+    { "sku": "WIN-401", "rack": "R4", "name": "Festive anarkali", "colour": "Ruby red", "hex": "#a3203a", "kind": "dress", "price": 3999, "tagline": "The window's showpiece, with zari on the yoke.", "details": ["Georgette with zari", "Flared, floor length", "Sizes XS to XL"] },
+    { "sku": "WIN-402", "rack": "R4", "name": "Silk-blend co-ord set", "colour": "Emerald", "hex": "#1f7a5a", "kind": "dress", "price": 3499, "tagline": "A matching top and palazzo with a soft sheen.", "details": ["Silk blend", "Relaxed fit", "Sizes XS to XL"] },
+    { "sku": "ACC-501", "rack": "R5", "name": "Canvas tote", "colour": "Natural", "hex": "#d8c7a3", "kind": "bag", "price": 799, "tagline": "Big enough for a laptop, tough enough for groceries.", "details": ["12 oz cotton canvas", "Inner zip pocket", "One size"] },
+    { "sku": "ACC-502", "rack": "R5", "name": "Leather belt", "colour": "Tan", "hex": "#a8693a", "kind": "belt", "price": 999, "tagline": "Full-grain leather that ages well.", "details": ["Full-grain leather", "Brass buckle", "Sizes 28 to 40"] },
+    { "sku": "ACC-503", "rack": "R5", "name": "Printed silk scarf", "colour": "Coral", "hex": "#e46f5a", "kind": "scarf", "price": 1199, "tagline": "A light square scarf in a hand-drawn print.", "details": ["Silk blend", "70 x 70 cm", "One size"] }
+  ]
+}

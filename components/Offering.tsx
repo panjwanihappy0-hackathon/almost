@@ -63,7 +63,7 @@ const ROADMAP = [
   "Before/after measurement of every fix",
   "Stock levels in the join, to rule out stock-outs",
   "Staff excluded from counts",
-  "An in-store box for near real-time results",
+  "Remote updates and health alerts for every store device",
 ];
 
 const FAQ = [
@@ -81,7 +81,11 @@ const FAQ = [
   },
   {
     q: "Do I need new cameras?",
-    a: "No. Almost works with a recorded clip from a camera you already have, as long as it can see the racks.",
+    a: "Not for rack stops: they work with a recorded clip from a camera you already have, as long as it can see the racks. Product pickups need a webcam or IP camera close to the rack, because a ceiling camera is too far away to see what's in a shopper's hand.",
+  },
+  {
+    q: "Do I need screens?",
+    a: "No. Pickups are counted with a camera alone. A screen beside the rack is optional: it shows the product a shopper is holding, and any display with a web browser will do.",
   },
   {
     q: "What data do I need?",

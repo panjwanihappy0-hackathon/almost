@@ -59,12 +59,34 @@ Use only the numbers given. Do not invent numbers, products or facts. Keep each 
 
 const pct = (share: number) => `${Math.round(share * 100)}%`;
 
-export async function writeBrief(store: string, flagged: RackResult[], frames: Frame[]): Promise<RackBrief[]> {
+type ContentPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
+
+// Sends one message to Gemini and returns its answer, which must match the schema.
+async function askGemini(parts: ContentPart[], name: string, schema: object): Promise<unknown> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new BriefError("missing_key", "OPENROUTER_API_KEY is not set");
   }
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "X-Title": "Almost" },
+    body: JSON.stringify({
+      model: process.env.OPENROUTER_MODEL || "google/gemini-3.8-flash",
+      messages: [{ role: "user", content: parts }],
+      temperature: 0.2,
+      response_format: { type: "json_schema", json_schema: { name, strict: true, schema } },
+    }),
+    signal: AbortSignal.timeout(55_000), // just under the route's 60 s limit on Vercel
+  });
+  if (res.status === 401) throw new BriefError("bad_key", "OpenRouter rejected the API key");
+  if (res.status === 402) throw new BriefError("no_credit", "OpenRouter account is out of credit");
+  if (!res.ok) throw new BriefError("failed", `OpenRouter answered ${res.status}: ${await res.text()}`);
 
+  const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  return JSON.parse(data.choices?.[0]?.message?.content ?? "{}");
+}
+
+export async function writeBrief(store: string, flagged: RackResult[], frames: Frame[]): Promise<RackBrief[]> {
   // Numbers as a small table, then each rack's snapshot frame labelled with its rack.
   const table = flagged
     .map(
@@ -75,7 +97,6 @@ export async function writeBrief(store: string, flagged: RackResult[], frames: F
     )
     .join("\n");
 
-  type ContentPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
   const parts: ContentPart[] = [{ type: "text", text: `${INSTRUCTIONS}\n\nStore: ${store}\nFlagged racks:\n${table}` }];
   for (const rack of flagged) {
     const frame = frames.find((f) => f.rackId === rack.rackId);
@@ -85,29 +106,8 @@ export async function writeBrief(store: string, flagged: RackResult[], frames: F
     }
   }
 
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "X-Title": "Almost" },
-    body: JSON.stringify({
-      model: process.env.OPENROUTER_MODEL || "google/gemini-3.8-flash",
-      messages: [{ role: "user", content: parts }],
-      temperature: 0.2,
-      response_format: {
-        type: "json_schema",
-        json_schema: { name: "rack_brief", strict: true, schema: BRIEF_SCHEMA },
-      },
-    }),
-    signal: AbortSignal.timeout(55_000), // just under the route's 60 s limit on Vercel
-  });
-  if (res.status === 401) throw new BriefError("bad_key", "OpenRouter rejected the API key");
-  if (res.status === 402) throw new BriefError("no_credit", "OpenRouter account is out of credit");
-  if (!res.ok) throw new BriefError("failed", `OpenRouter answered ${res.status}: ${await res.text()}`);
-
-  const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-  const text = data.choices?.[0]?.message?.content ?? "{}";
-
   // Keep only well-formed entries for racks we actually flagged, in table order.
-  const parsed = JSON.parse(text) as { racks?: RackBrief[] };
+  const parsed = (await askGemini(parts, "rack_brief", BRIEF_SCHEMA)) as { racks?: RackBrief[] };
   const byId = new Map((parsed.racks ?? []).map((b) => [b.rack_id, b]));
   const briefs = flagged
     .map((r) => byId.get(r.rackId))
@@ -118,6 +118,84 @@ export async function writeBrief(store: string, flagged: RackResult[], frames: F
     );
   if (briefs.length === 0) {
     throw new BriefError("failed", "Gemini's answer had no usable rack briefs");
+  }
+  return briefs;
+}
+
+// ---- Product brief: for products shoppers pick up a lot but rarely buy.
+
+export type ProductBrief = {
+  sku: string;
+  headline: string;
+  reasons: string[];
+  other_causes: string[];
+  fix: string;
+};
+
+const PRODUCT_BRIEF_SCHEMA = {
+  type: "object",
+  properties: {
+    products: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          sku: { type: "string" },
+          headline: { type: "string", description: "One line that states the gap with the numbers." },
+          reasons: { type: "array", items: { type: "string" }, description: "Exactly 2 likely reasons." },
+          other_causes: { type: "array", items: { type: "string" }, description: "Price, size, stock and promo checks." },
+          fix: { type: "string", description: "One concrete fix the store can make this week." },
+        },
+        required: ["sku", "headline", "reasons", "other_causes", "fix"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["products"],
+  additionalProperties: false,
+};
+
+const PRODUCT_INSTRUCTIONS = `You advise the head of retail at an Indian fashion brand.
+A camera beside each rack recorded how often shoppers picked up each product, how long they held it, and how often they put it back on the shelf. The POS counted units sold.
+The products below are picked up a lot but sell little.
+For each product:
+- headline: one line stating the gap, using the exact numbers given.
+- reasons: exactly 2 likely reasons shoppers pick it up but don't buy it. Use the hold time and put-back rate: a long hold then a put-back suggests price, fit or fabric doubts; a short hold suggests the product looks better from a distance than in hand. Use the products it is compared with, if given.
+- other_causes: list size availability, stock, price and promotions as checks to make before changing anything, each as a short check.
+- fix: one concrete change the store team can make this week.
+Use only the numbers given. Do not invent numbers, products or facts. Keep each item to one or two sentences.`;
+
+export async function writeProductBrief(
+  flagged: { sku: string; name: string; colour: string; price: number; rackName: string; pickups: number; pickupShare: number;
+    avgHoldS: number | null; putBackRate: number | null; unitsSold: number | null; salesShare: number | null;
+    comparedWith: string[] }[],
+): Promise<ProductBrief[]> {
+  const table = flagged
+    .map(
+      (p) =>
+        `- ${p.sku} "${p.name}" (${p.colour}, ₹${p.price}, on ${p.rackName}): picked up ${p.pickups} times ` +
+        `(${pct(p.pickupShare)} of all pickups), held ${p.avgHoldS ?? "?"} s on average, ` +
+        `put back ${p.putBackRate === null ? "?" : pct(p.putBackRate)} of the time, ` +
+        `${p.unitsSold ?? 0} units sold (${pct(p.salesShare ?? 0)} of sales)` +
+        (p.comparedWith.length ? `, most often compared with ${p.comparedWith.join(" and ")}` : ""),
+    )
+    .join("\n");
+
+  const parsed = (await askGemini(
+    [{ type: "text", text: `${PRODUCT_INSTRUCTIONS}\n\nFlagged products:\n${table}` }],
+    "product_brief",
+    PRODUCT_BRIEF_SCHEMA,
+  )) as { products?: ProductBrief[] };
+  const bySku = new Map((parsed.products ?? []).map((b) => [b.sku, b]));
+  const briefs = flagged
+    .map((p) => bySku.get(p.sku))
+    .filter(
+      (b): b is ProductBrief =>
+        !!b && typeof b.headline === "string" && typeof b.fix === "string" &&
+        Array.isArray(b.reasons) && Array.isArray(b.other_causes),
+    );
+  if (briefs.length === 0) {
+    throw new BriefError("failed", "Gemini's answer had no usable product briefs");
   }
   return briefs;
 }

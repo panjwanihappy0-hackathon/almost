@@ -4,11 +4,12 @@
 import CameraView from "./CameraView";
 import { Categories, Faq, Measured, RackFunnel, Roadmap, UseCases, WhatToCheck, WhyAlmost } from "./Offering";
 import Reveal from "./Reveal";
-import { Section } from "./Section";
+import { Badge, Section } from "./Section";
 
 const NAV = [
   { href: "#how", label: "How it works" },
   { href: "#insight", label: "Insight" },
+  { href: "#pickups", label: "Pickups" },
   { href: "#use-cases", label: "Use cases" },
   { href: "#privacy", label: "Privacy" },
   { href: "#faq", label: "FAQ" },
@@ -41,6 +42,12 @@ const BENEFITS = [
   { title: "Fewer store visits", text: "Go only where the data points, with an agenda, instead of walking every store every week." },
   { title: "Layouts backed by behaviour", text: "Shelf and display changes rest on what shoppers actually did, not a visit-day impression." },
   { title: "Every fix checked", text: "Each suggestion comes with the numbers behind it and the other causes to rule out first." },
+];
+
+const PICKUP_PARTS = [
+  { title: "Pickup detector", text: "Runs on a laptop in the store. Learns each product from about 20 photos you take with the webcam, then turns pickups, holds and put-backs into events, even with the internet down.", href: null, link: "" },
+  { title: "Product funnel", text: "On the shelf, picked up, held, compared, put back, purchased. Join your POS export to find products shoppers love in hand but don't buy.", href: "/dashboard", link: "Open the dashboard" },
+  { title: "Lift and learn", text: "Optional: the screen beside the rack switches to the product in the shopper's hand, and back to its playlist when it's put down. No touch, no QR code.", href: "/screen", link: "Set up a screen" },
 ];
 
 const PRIVACY = [
@@ -191,6 +198,29 @@ export default function Landing() {
           </Reveal>
         </div>
         <WhatToCheck />
+      </Section>
+
+      {/* Product pickups */}
+      <Section
+        id="pickups"
+        eyebrow="Closer to the rack"
+        title={<>Which product.<br /><span className="text-amber">Not just which rack.</span></>}
+        intro="Put a webcam beside a rack and Almost sees the exact product and colour in a shopper's hand: when it's picked up, how long it's held, what it's compared with and whether it goes back."
+      >
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {PICKUP_PARTS.map((p, i) => (
+            <Reveal key={p.title} className="card flex flex-col p-7" delay={i * 90}>
+              <Badge status="now" />
+              <p className="display mt-4 text-2xl">{p.title}</p>
+              <p className="mt-3 flex-1 text-muted">{p.text}</p>
+              {p.href && (
+                <a href={p.href} className="mt-6 text-sm font-bold text-amber hover:underline">
+                  {p.link} <span aria-hidden>→</span>
+                </a>
+              )}
+            </Reveal>
+          ))}
+        </div>
       </Section>
 
       <UseCases />

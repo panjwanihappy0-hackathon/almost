@@ -49,3 +49,7 @@ next-env.d.ts
 *.mkv
 __pycache__/
 .venv/
+
+# pickup detector: downloaded YOLO models, and product photos (they can show shoppers' or staff's hands)
+*.pt
+/detector/products/

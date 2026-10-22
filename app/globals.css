@@ -146,3 +146,14 @@ body {
   .js [data-reveal] { opacity: 1; transform: none; transition: none; }
   .rec-dot, .pulse-ring, .shopper-path, .animate-heat { animation: none; }
 }
+
+/* Smart screen: each new product slides in. */
+.screen-in {
+  animation: screen-in 0.35s ease-out;
+}
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(14px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-in { animation: none; }
+}
