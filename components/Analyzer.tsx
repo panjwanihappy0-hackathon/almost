@@ -112,75 +112,84 @@ export default function Analyzer() {
   const top = analysis?.racks.find((r) => r.flagged);
 
   return (
-    <section id="try" className="mx-auto w-full max-w-5xl scroll-mt-6 px-4 py-16 sm:px-6">
-      <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Try it on a day of footage</h2>
-      <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">
+    <section id="try" className="mx-auto w-full max-w-6xl scroll-mt-16 px-4 py-24 sm:px-6">
+      <p className="eyebrow">Live demo</p>
+      <h2 className="display mt-4 text-4xl sm:text-6xl">
+        Try it on a day
+        <br />
+        <span className="text-amber">of footage.</span>
+      </h2>
+      <p className="mt-6 max-w-2xl text-lg text-muted">
         Upload the stops file from the stop counter, the same day&apos;s POS export, and up to {MAX_FRAMES} snapshot
-        frames named like <code className="font-mono text-sm">rack_R4.jpg</code>.
+        frames named like <code className="font-mono text-base text-fg">rack_R4.jpg</code>.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 grid gap-4 sm:grid-cols-3">
+      <form onSubmit={onSubmit} className="mt-10 grid gap-4 md:grid-cols-3">
         <FilePicker
+          step="01"
           label="Stops file"
           hint="stops.csv: rack_id, hour, stops"
           accept=".csv"
+          files={stops ? [stops] : []}
           onChange={(fs) => setStops(fs[0] ?? null)}
         />
         <FilePicker
+          step="02"
           label="POS sales file"
           hint="CSV with sku and quantity columns"
           accept=".csv"
+          files={sales ? [sales] : []}
           onChange={(fs) => setSales(fs[0] ?? null)}
         />
         <FilePicker
-          label="Snapshot frames (optional)"
-          hint={`Up to ${MAX_FRAMES} images, 1 MB each`}
+          step="03"
+          label="Snapshot frames"
+          hint={`Optional · up to ${MAX_FRAMES} images, 1 MB each`}
           accept="image/jpeg,image/png,image/webp"
           multiple
+          files={frames}
           onChange={setFrames}
         />
-        <div className="sm:col-span-3">
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded-full bg-amber-500 px-6 py-3 font-semibold text-zinc-950 transition hover:bg-amber-400 disabled:cursor-wait disabled:opacity-60"
-          >
-            {busy ? "Analysing…" : "Analyse"}
+        <div className="md:col-span-3">
+          <button type="submit" disabled={busy} className="btn-primary">
+            {busy ? "Analysing…" : <>Analyse <span aria-hidden>→</span></>}
           </button>
         </div>
       </form>
 
       {errors.length > 0 && (
-        <div role="alert" className="mt-6 rounded-xl border border-red-300 bg-red-50 p-4 text-red-900 dark:border-red-900 dark:bg-red-950/50 dark:text-red-200">
-          <p className="font-semibold">Please fix {errors.length === 1 ? "this" : "these"} and try again:</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
+        <div role="alert" className="mt-8 rounded-2xl border border-red-500/40 bg-red-500/10 p-5 text-red-200">
+          <p className="font-bold text-red-100">Please fix {errors.length === 1 ? "this" : "these"} and try again:</p>
+          <ul className="mt-3 space-y-1.5">
             {errors.map((e) => (
-              <li key={e}>{e}</li>
+              <li key={e} className="flex gap-3">
+                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-red-400" /> {e}
+              </li>
             ))}
           </ul>
         </div>
       )}
 
       {analysis && (
-        <div className="mt-10">
-          {top ? (
-            <p className="text-xl font-semibold sm:text-2xl">
-              <span className="text-amber-600 dark:text-amber-400">
-                {top.name} ({top.rackId})
-              </span>{" "}
-              gets {pct(top.stopShare)} of stops but only {pct(top.salesShare)} of sales.
+        <div className="mt-14">
+          <div className="card p-6 sm:p-8">
+            <p className="text-xs font-bold tracking-[0.18em] text-muted uppercase">
+              {analysis.store} · {analysis.totalStops} stops · {analysis.totalUnits} units sold
             </p>
-          ) : (
-            <p className="text-xl font-semibold">No rack stands out: stops and sales line up.</p>
-          )}
-          <p className="mt-1 text-sm text-zinc-500">
-            {analysis.store} · {analysis.totalStops} stops · {analysis.totalUnits} units sold
-          </p>
+            {top ? (
+              <p className="display mt-4 text-3xl sm:text-5xl">
+                <span className="text-amber">{top.name}</span> gets {pct(top.stopShare)} of stops but only{" "}
+                <span className="text-mint">{pct(top.salesShare)}</span> of sales.
+              </p>
+            ) : (
+              <p className="display mt-4 text-3xl sm:text-4xl">No rack stands out: stops and sales line up.</p>
+            )}
+          </div>
 
           <RackTable racks={analysis.racks} />
 
           {analysis.notes.map((n) => (
-            <p key={n} className="mt-3 text-sm text-zinc-500">
+            <p key={n} className="mt-3 text-sm text-muted">
               Note: {n}
             </p>
           ))}
@@ -193,22 +202,33 @@ export default function Analyzer() {
 }
 
 function FilePicker(props: {
+  step: string;
   label: string;
   hint: string;
   accept: string;
   multiple?: boolean;
+  files: File[];
   onChange: (files: File[]) => void;
 }) {
+  const chosen = props.files.map((f) => f.name).join(", ");
   return (
-    <label className="flex flex-col gap-2 rounded-xl border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-      <span className="font-medium">{props.label}</span>
-      <span className="text-sm text-zinc-500">{props.hint}</span>
+    <label
+      className={`card group relative flex cursor-pointer flex-col gap-2 p-6 transition hover:border-amber/50 ${
+        chosen ? "border-amber/50" : "border-dashed"
+      }`}
+    >
+      <span className="font-mono text-sm text-amber">{props.step}</span>
+      <span className="display text-xl">{props.label}</span>
+      <span className="text-sm text-muted">{props.hint}</span>
+      <span className={`mt-3 truncate text-sm ${chosen ? "text-fg" : "text-muted"}`}>
+        {chosen ? `✓ ${chosen}` : "Click to choose a file"}
+      </span>
       <input
         type="file"
         accept={props.accept}
         multiple={props.multiple}
         onChange={(e) => props.onChange(Array.from(e.target.files ?? []))}
-        className="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm dark:file:bg-zinc-800 dark:file:text-zinc-100"
+        className="absolute inset-0 cursor-pointer opacity-0"
       />
     </label>
   );
@@ -216,9 +236,9 @@ function FilePicker(props: {
 
 function ShareBar({ share, color }: { share: number; color: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="h-2 w-16 overflow-hidden rounded-full bg-zinc-200 sm:w-24 dark:bg-zinc-800">
-        <div className={`h-full ${color}`} style={{ width: `${Math.round(share * 100)}%` }} />
+    <div className="flex items-center gap-3">
+      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/10 sm:w-24">
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.round(share * 100)}%` }} />
       </div>
       <span className="tabular-nums">{pct(share)}</span>
     </div>
@@ -227,43 +247,38 @@ function ShareBar({ share, color }: { share: number; color: string }) {
 
 function RackTable({ racks }: { racks: RackResult[] }) {
   return (
-    <div className="mt-6 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="bg-zinc-50 text-zinc-500 dark:bg-zinc-900">
+    <div className="card mt-4 overflow-x-auto">
+      <table className="w-full min-w-[680px] text-left text-sm">
+        <thead className="text-xs tracking-[0.14em] text-muted uppercase">
           <tr>
-            <th className="px-4 py-3 font-medium">#</th>
-            <th className="px-4 py-3 font-medium">Rack</th>
-            <th className="px-4 py-3 font-medium">Stops</th>
-            <th className="px-4 py-3 font-medium">% of stops</th>
-            <th className="px-4 py-3 font-medium">Units sold</th>
-            <th className="px-4 py-3 font-medium">% of sales</th>
-            <th className="px-4 py-3 font-medium">Busiest hour</th>
+            <th className="px-5 py-4 font-bold">#</th>
+            <th className="px-5 py-4 font-bold">Rack</th>
+            <th className="px-5 py-4 font-bold">Stops</th>
+            <th className="px-5 py-4 font-bold">% of stops</th>
+            <th className="px-5 py-4 font-bold">Units sold</th>
+            <th className="px-5 py-4 font-bold">% of sales</th>
+            <th className="px-5 py-4 font-bold">Busiest hour</th>
           </tr>
         </thead>
         <tbody>
           {racks.map((r, i) => (
-            <tr
-              key={r.rackId}
-              className={`border-t border-zinc-200 dark:border-zinc-800 ${r.flagged ? "bg-amber-50 dark:bg-amber-950/30" : ""}`}
-            >
-              <td className="px-4 py-3 tabular-nums">{i + 1}</td>
-              <td className="px-4 py-3">
-                <span className="font-medium">{r.name}</span> <span className="text-zinc-500">{r.rackId}</span>
+            <tr key={r.rackId} className={`border-t border-line ${r.flagged ? "bg-amber/[0.07]" : ""}`}>
+              <td className="px-5 py-4 font-mono text-muted tabular-nums">{String(i + 1).padStart(2, "0")}</td>
+              <td className="px-5 py-4">
+                <span className="font-semibold">{r.name}</span> <span className="text-muted">{r.rackId}</span>
                 {r.flagged && (
-                  <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-semibold text-zinc-950">
-                    Flagged
-                  </span>
+                  <span className="ml-2 rounded-full bg-amber px-2.5 py-0.5 text-xs font-bold text-amber-ink">Flagged</span>
                 )}
               </td>
-              <td className="px-4 py-3 tabular-nums">{r.stops}</td>
-              <td className="px-4 py-3">
-                <ShareBar share={r.stopShare} color="bg-amber-500" />
+              <td className="px-5 py-4 tabular-nums">{r.stops}</td>
+              <td className="px-5 py-4">
+                <ShareBar share={r.stopShare} color="bg-amber" />
               </td>
-              <td className="px-4 py-3 tabular-nums">{r.unitsSold}</td>
-              <td className="px-4 py-3">
-                <ShareBar share={r.salesShare} color="bg-teal-500" />
+              <td className="px-5 py-4 tabular-nums">{r.unitsSold}</td>
+              <td className="px-5 py-4">
+                <ShareBar share={r.salesShare} color="bg-mint" />
               </td>
-              <td className="px-4 py-3 tabular-nums">{r.busiestHour ?? "—"}</td>
+              <td className="px-5 py-4 tabular-nums text-muted">{r.busiestHour ?? "—"}</td>
             </tr>
           ))}
         </tbody>
@@ -283,15 +298,19 @@ function BriefSection({
 }) {
   if (brief.status === "idle") return null;
   return (
-    <div className="mt-12">
-      <h3 className="text-xl font-semibold">Brief</h3>
-      <p className="text-sm text-zinc-500">Written by AI (Gemini) from the numbers above. Check before acting.</p>
+    <div className="mt-16">
+      <p className="eyebrow">AI brief</p>
+      <h3 className="display mt-3 text-3xl sm:text-4xl">What to fix this week</h3>
+      <p className="mt-2 text-sm text-muted">Written by AI (Gemini) from the numbers above. Check before acting.</p>
 
       {brief.status === "loading" && (
-        <p className="mt-4 animate-pulse text-zinc-600 dark:text-zinc-400">Writing the brief…</p>
+        <div className="card mt-6 flex items-center gap-3 p-6 text-muted">
+          <span className="size-2 animate-pulse rounded-full bg-amber" />
+          Writing the brief… this takes 10–20 seconds.
+        </div>
       )}
       {brief.status === "error" && (
-        <p role="alert" className="mt-4 rounded-xl border border-zinc-300 p-4 dark:border-zinc-700">
+        <p role="alert" className="card mt-6 p-6">
           {brief.message}
         </p>
       )}
@@ -300,27 +319,24 @@ function BriefSection({
           const rack = racks.find((r) => r.rackId === b.rack_id);
           const frame = frameUrls[b.rack_id];
           return (
-            <article
-              key={b.rack_id}
-              className="mt-6 grid gap-6 rounded-2xl border border-zinc-200 p-5 sm:grid-cols-[1fr_16rem] dark:border-zinc-800"
-            >
+            <article key={b.rack_id} className="card mt-6 grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_20rem]">
               <div>
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                <p className="text-xs font-bold tracking-[0.18em] text-amber uppercase">
                   {rack?.name ?? b.rack_id} · {b.rack_id}
                 </p>
-                <h4 className="mt-1 text-lg font-semibold">{b.headline}</h4>
-                <BriefList title="Likely reasons" items={b.reasons} />
-                <BriefList title="Rule these out first" items={b.other_causes} />
-                <p className="mt-4 rounded-lg bg-teal-50 p-3 text-teal-950 dark:bg-teal-950/40 dark:text-teal-100">
-                  <span className="font-semibold">Suggested fix: </span>
-                  {b.fix}
-                </p>
+                <h4 className="display mt-3 text-2xl">{b.headline}</h4>
+                <BriefList title="Likely reasons" items={b.reasons} dot="bg-amber" />
+                <BriefList title="Rule these out first" items={b.other_causes} dot="bg-muted" />
+                <div className="mt-6 rounded-2xl border border-mint/40 bg-mint/10 p-4">
+                  <p className="text-xs font-bold tracking-[0.18em] text-mint uppercase">Suggested fix</p>
+                  <p className="mt-1.5">{b.fix}</p>
+                </div>
               </div>
               {frame ? (
                 // eslint-disable-next-line @next/next/no-img-element -- local preview of the user's own file
-                <img src={frame} alt={`Snapshot of rack ${b.rack_id}`} className="w-full rounded-xl object-cover" />
+                <img src={frame} alt={`Snapshot of rack ${b.rack_id}`} className="w-full rounded-xl border border-line object-cover" />
               ) : (
-                <div className="flex items-center justify-center rounded-xl bg-zinc-100 p-6 text-sm text-zinc-500 dark:bg-zinc-900">
+                <div className="flex min-h-40 items-center justify-center self-start rounded-xl border border-dashed border-line p-6 text-center text-sm text-muted">
                   No snapshot frame uploaded for this rack
                 </div>
               )}
@@ -331,13 +347,16 @@ function BriefSection({
   );
 }
 
-function BriefList({ title, items }: { title: string; items: string[] }) {
+function BriefList({ title, items, dot }: { title: string; items: string[]; dot: string }) {
   return (
-    <div className="mt-4">
-      <p className="text-sm font-semibold">{title}</p>
-      <ul className="mt-1 list-disc space-y-1 pl-5 text-zinc-700 dark:text-zinc-300">
+    <div className="mt-6">
+      <p className="text-xs font-bold tracking-[0.18em] text-muted uppercase">{title}</p>
+      <ul className="mt-3 space-y-2.5">
         {items.map((item) => (
-          <li key={item}>{item}</li>
+          <li key={item} className="flex gap-3 text-fg/90">
+            <span className={`mt-2 size-1.5 shrink-0 rounded-full ${dot}`} />
+            {item}
+          </li>
         ))}
       </ul>
     </div>
