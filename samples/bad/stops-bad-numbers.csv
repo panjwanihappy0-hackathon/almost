@@ -1,0 +1,4 @@
+rack_id,hour,stops
+R1,11:00,ten
+R2,11:00,-3
+R4,11:00,20

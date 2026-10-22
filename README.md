@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Almost
 
-## Getting Started
+See which racks shoppers stop at but don't buy from, using the CCTV a store already has.
 
-First, run the development server:
+Upload a day's stop counts and POS sales → get racks ranked by "% of stops vs % of sales" → read an AI brief (Gemini) with likely reasons and a suggested fix.
+
+## Run the web app
+
+1. Copy `.env.example` to `.env.local` and paste your Gemini API key after `GEMINI_API_KEY=` (get one at https://aistudio.google.com/apikey). `.env.local` is ignored by git.
+2. `npm install`
+3. `npm run dev`, then open http://localhost:3000
+4. Try it with the files in `samples/good/`. Every file in `samples/bad/` should give a clear error.
+
+## Count stops from footage (on the laptop)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r detector/requirements.txt
+python detector/count_stops.py clip.mp4 --first-frame   # saves output/first_frame.jpg
+# draw each rack's corners into detector/zones.json, then:
+python detector/count_stops.py clip.mp4 --start 11:00
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Upload `output/stops.csv` and up to 4 images from `output/frames/`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Set up for your store
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `data/rack-map.json`: which SKUs sit on which rack (the current one is a sample).
+- `lib/parse.ts` → `POS_COLUMNS`: the SKU and quantity column names in your POS export.
+- `lib/limits.ts`: file size limits and the flag rule (≥ 10% of stops and sales share under half the stop share).
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Push to GitHub, import the repo in Vercel, and add `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`) under Project → Settings → Environment Variables.

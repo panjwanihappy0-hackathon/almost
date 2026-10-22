@@ -1,0 +1,10 @@
+{
+  "store": "Ahmedabad (sample map: replace with the real racks and SKUs)",
+  "racks": [
+    { "id": "R1", "name": "Denim wall", "skus": ["DNM-101", "DNM-102", "DNM-103"] },
+    { "id": "R2", "name": "New arrivals table", "skus": ["NEW-201", "NEW-202", "NEW-203"] },
+    { "id": "R3", "name": "Kurta rack", "skus": ["KRT-301", "KRT-302", "KRT-303"] },
+    { "id": "R4", "name": "Window display rack", "skus": ["WIN-401", "WIN-402"] },
+    { "id": "R5", "name": "Accessories stand", "skus": ["ACC-501", "ACC-502", "ACC-503"] }
+  ]
+}
