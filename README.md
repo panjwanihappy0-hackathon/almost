@@ -32,6 +32,6 @@ Upload `output/stops.csv` and up to 4 images from `output/frames/`.
 
 ## Deploy
 
-Live at https://almost-gamma.vercel.app. The Vercel project is linked to this GitHub repo, so every push to `main` deploys automatically.
+Live at https://almost-wine.vercel.app. The Vercel project is linked to this GitHub repo, so every push to `main` deploys automatically.
 
 `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` are set under Vercel → Project → Settings → Environment Variables. After changing them, redeploy for them to take effect.
