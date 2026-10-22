@@ -2,12 +2,16 @@
 // Plain content only: no data, no AI. Numbers marked "example" are illustrations.
 
 import CameraView from "./CameraView";
+import { Categories, Faq, Measured, RackFunnel, Roadmap, UseCases, WhatToCheck, WhyAlmost } from "./Offering";
 import Reveal from "./Reveal";
+import { Section } from "./Section";
 
 const NAV = [
   { href: "#how", label: "How it works" },
   { href: "#insight", label: "Insight" },
+  { href: "#use-cases", label: "Use cases" },
   { href: "#privacy", label: "Privacy" },
+  { href: "#faq", label: "FAQ" },
 ];
 
 const PILLARS = [
@@ -25,13 +29,13 @@ const STATS = [
 
 const STEPS = [
   { n: "01", title: "Watch", metric: "1 camera", sub: "recorded footage", text: "The CCTV you already have records the floor as usual. No new hardware, no tags on products." },
-  { n: "02", title: "Understand", metric: "3 s", sub: "in a rack zone = a stop", text: "AI follows each shopper anonymously and notes where they stop, how long they stay and which racks they walk past." },
+  { n: "02", title: "Understand", metric: "3 s", sub: "in a rack zone = a stop", text: "AI follows each shopper anonymously and notes which rack they stop at and when." },
   { n: "03", title: "Compare", metric: "5 racks", sub: "matched to the POS", text: "Each rack's share of stops is set against its share of till sales, through a simple rack-to-product map." },
   { n: "04", title: "Act", metric: "1 fix", sub: "per flagged rack", text: "An AI brief explains likely reasons and suggests a fix, such as moving a rack, changing a display or restocking a size." },
 ];
 
 const POS_SEES = ["Bill number and time", "SKU and quantity", "Revenue per store"];
-const ALMOST_ADDS = ["Stops at every rack", "The busiest hour per rack", "Racks shoppers walk past", "A frame of the moment, as evidence"];
+const ALMOST_ADDS = ["Stops at every rack", "The busiest hour per rack", "Sales per 100 stops, rack by rack", "A frame of the moment, as evidence"];
 
 const BENEFITS = [
   { title: "Fewer store visits", text: "Go only where the data points, with an agenda, instead of walking every store every week." },
@@ -42,7 +46,7 @@ const BENEFITS = [
 const PRIVACY = [
   { title: "No face recognition", text: "Shoppers are tracked as anonymous boxes within one camera. No faces are stored or matched." },
   { title: "No shopper profiles", text: "Nobody is identified, and no one is recognised from one visit to the next." },
-  { title: "Counts leave, footage stays", text: "Video is processed in the store. Only anonymous stop counts per rack go into the report." },
+  { title: "Footage stays on your computer", text: "Stops are counted on your own laptop. Only the counts, and any snapshot frames you choose to upload for the AI brief, leave it." },
 ];
 
 export default function Landing() {
@@ -135,6 +139,8 @@ export default function Landing() {
         </div>
       </Section>
 
+      <RackFunnel />
+
       {/* How it works */}
       <Section id="how" eyebrow="How Almost works" title={<>One camera. One day.<br /><span className="text-amber">One ranked list.</span></>}>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -184,7 +190,11 @@ export default function Landing() {
             <FloorPlan />
           </Reveal>
         </div>
+        <WhatToCheck />
       </Section>
+
+      <UseCases />
+      <Categories />
 
       {/* Benefits */}
       <Section id="value" eyebrow="Why it matters" title={<>Visit fewer stores.<br /><span className="text-muted">Fix the right rack.</span></>}>
@@ -197,6 +207,9 @@ export default function Landing() {
           ))}
         </div>
       </Section>
+
+      <Measured />
+      <WhyAlmost />
 
       {/* Privacy */}
       <Section id="privacy" eyebrow="Privacy by design" title={<>Counts racks.<br /><span className="text-muted">Never people.</span></>}>
@@ -211,19 +224,10 @@ export default function Landing() {
             </Reveal>
           ))}
         </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <Reveal className="card border-mint/30 p-7">
-            <p className="text-xs font-bold tracking-[0.2em] text-mint uppercase">Today</p>
-            <p className="mt-2 text-lg">Analyses a recorded day of footage from one camera, joined with that day&apos;s POS sales.</p>
-          </Reveal>
-          <Reveal className="card border-dashed p-7" delay={90}>
-            <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">Next</p>
-            <p className="mt-2 text-lg text-muted">
-              Near real-time analysis on an in-store box, every camera, every store, with before/after checks on each fix.
-            </p>
-          </Reveal>
-        </div>
       </Section>
+
+      <Roadmap />
+      <Faq />
     </>
   );
 }
@@ -250,20 +254,6 @@ function SiteHeader() {
         </a>
       </div>
     </header>
-  );
-}
-
-function Section({ id, eyebrow, title, children }: { id: string; eyebrow: string; title: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <section id={id} className="scroll-mt-16 border-t border-line">
-      <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6">
-        <Reveal>
-          <p className="eyebrow">{eyebrow}</p>
-          <h2 className="display mt-4 text-4xl sm:text-6xl">{title}</h2>
-        </Reveal>
-        {children}
-      </div>
-    </section>
   );
 }
 

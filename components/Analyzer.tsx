@@ -248,7 +248,7 @@ function ShareBar({ share, color }: { share: number; color: string }) {
 function RackTable({ racks }: { racks: RackResult[] }) {
   return (
     <div className="card mt-4 overflow-x-auto">
-      <table className="w-full min-w-[680px] text-left text-sm">
+      <table className="w-full min-w-[780px] text-left text-sm">
         <thead className="text-xs tracking-[0.14em] text-muted uppercase">
           <tr>
             <th className="px-5 py-4 font-bold">#</th>
@@ -257,6 +257,7 @@ function RackTable({ racks }: { racks: RackResult[] }) {
             <th className="px-5 py-4 font-bold">% of stops</th>
             <th className="px-5 py-4 font-bold">Units sold</th>
             <th className="px-5 py-4 font-bold">% of sales</th>
+            <th className="px-5 py-4 font-bold" title="Units sold for every 100 stops at this rack">Sales / 100 stops</th>
             <th className="px-5 py-4 font-bold">Busiest hour</th>
           </tr>
         </thead>
@@ -277,6 +278,9 @@ function RackTable({ racks }: { racks: RackResult[] }) {
               <td className="px-5 py-4 tabular-nums">{r.unitsSold}</td>
               <td className="px-5 py-4">
                 <ShareBar share={r.salesShare} color="bg-mint" />
+              </td>
+              <td className={`px-5 py-4 tabular-nums ${r.flagged ? "font-semibold text-amber" : ""}`}>
+                {r.salesPer100Stops ?? "—"}
               </td>
               <td className="px-5 py-4 tabular-nums text-muted">{r.busiestHour ?? "—"}</td>
             </tr>

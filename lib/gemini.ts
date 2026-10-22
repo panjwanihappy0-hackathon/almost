@@ -70,7 +70,7 @@ export async function writeBrief(store: string, flagged: RackResult[], frames: F
     .map(
       (r) =>
         `- ${r.rackId} "${r.name}": ${r.stops} stops (${pct(r.stopShare)} of all stops), ` +
-        `${r.unitsSold} units sold (${pct(r.salesShare)} of all sales)` +
+        `${r.unitsSold} units sold (${pct(r.salesShare)} of all sales), ${r.salesPer100Stops} units per 100 stops` +
         (r.busiestHour ? `, busiest hour ${r.busiestHour}` : ""),
     )
     .join("\n");

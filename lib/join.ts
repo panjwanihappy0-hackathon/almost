@@ -14,6 +14,7 @@ export type RackResult = {
   stopShare: number; // 0 to 1
   unitsSold: number;
   salesShare: number; // 0 to 1
+  salesPer100Stops: number | null; // units sold for every 100 stops; null when the rack had no stops
   busiestHour: string | null;
   flagged: boolean;
 };
@@ -103,6 +104,7 @@ export function joinStopsAndSales(map: RackMap, stops: StopRow[], sales: SaleRow
       stopShare,
       unitsSold: units,
       salesShare,
+      salesPer100Stops: rackStops > 0 ? Math.round((units / rackStops) * 100) : null,
       busiestHour,
       flagged: stopShare >= MIN_STOP_SHARE && salesShare < stopShare * SALES_TO_STOPS_RATIO,
     };
