@@ -6,7 +6,7 @@ Upload a day's stop counts and POS sales → get racks ranked by "% of stops vs 
 
 ## Run the web app
 
-1. Copy `.env.example` to `.env.local` and paste your Gemini API key after `GEMINI_API_KEY=` (get one at https://aistudio.google.com/apikey). `.env.local` is ignored by git.
+1. Copy `.env.example` to `.env.local` and paste your OpenRouter API key after `OPENROUTER_API_KEY=` (get one at https://openrouter.ai/keys; Gemini is reached through OpenRouter). `.env.local` is ignored by git.
 2. `npm install`
 3. `npm run dev`, then open http://localhost:3000
 4. Try it with the files in `samples/good/`. Every file in `samples/bad/` should give a clear error.
@@ -32,4 +32,4 @@ Upload `output/stops.csv` and up to 4 images from `output/frames/`.
 
 ## Deploy
 
-Push to GitHub, import the repo in Vercel, and add `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`) under Project → Settings → Environment Variables.
+Push to GitHub, import the repo in Vercel, and add `OPENROUTER_API_KEY` (and optionally `OPENROUTER_MODEL`) under Project → Settings → Environment Variables.

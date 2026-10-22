@@ -2,7 +2,7 @@
 // Gemini is only called when every file passed the checks.
 
 import { analyzeUpload, rackMap } from "@/lib/analyze";
-import { writeBrief } from "@/lib/gemini";
+import { BriefError, writeBrief } from "@/lib/gemini";
 
 // Give Gemini up to a minute on Vercel.
 export const maxDuration = 60;
@@ -30,10 +30,13 @@ export async function POST(request: Request) {
     return Response.json({ racks });
   } catch (err) {
     console.error("brief: Gemini failed:", err);
-    const message = err instanceof Error ? err.message : "";
-    let error = "Brief unavailable: Gemini didn't answer. Try again.";
-    if (message.includes("GEMINI_API_KEY")) error = "Brief unavailable: the Gemini API key isn't set on the server.";
-    if (message.includes("API_KEY_INVALID")) error = "Brief unavailable: Google rejected the Gemini API key. Check GEMINI_API_KEY.";
+    const reason = err instanceof BriefError ? err.reason : "failed";
+    const error = {
+      missing_key: "Brief unavailable: the OpenRouter API key isn't set on the server.",
+      bad_key: "Brief unavailable: OpenRouter rejected the API key. Check OPENROUTER_API_KEY.",
+      no_credit: "Brief unavailable: the OpenRouter account is out of credit.",
+      failed: "Brief unavailable: Gemini didn't answer. Try again.",
+    }[reason];
     return Response.json(
       { error },
       { status: 502 },
