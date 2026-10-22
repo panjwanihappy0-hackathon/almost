@@ -30,13 +30,12 @@ export async function POST(request: Request) {
     return Response.json({ racks });
   } catch (err) {
     console.error("brief: Gemini failed:", err);
-    const missingKey = err instanceof Error && err.message.includes("GEMINI_API_KEY");
+    const message = err instanceof Error ? err.message : "";
+    let error = "Brief unavailable: Gemini didn't answer. Try again.";
+    if (message.includes("GEMINI_API_KEY")) error = "Brief unavailable: the Gemini API key isn't set on the server.";
+    if (message.includes("API_KEY_INVALID")) error = "Brief unavailable: Google rejected the Gemini API key. Check GEMINI_API_KEY.";
     return Response.json(
-      {
-        error: missingKey
-          ? "Brief unavailable: the Gemini API key isn't set on the server."
-          : "Brief unavailable: Gemini didn't answer. Try again.",
-      },
+      { error },
       { status: 502 },
     );
   }
