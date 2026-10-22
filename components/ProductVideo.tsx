@@ -62,7 +62,7 @@ export default function ProductVideo() {
             <button
               type="button"
               onClick={toggle}
-              className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/60 px-3.5 py-1.5 text-xs font-bold backdrop-blur transition hover:bg-black/80"
+              className="absolute top-3 left-3 rounded-full border border-white/20 bg-black/60 px-3.5 py-1.5 text-xs font-bold backdrop-blur transition hover:bg-black/80"
             >
               {playing ? "❚❚ Pause" : "▶ Play"}
             </button>
