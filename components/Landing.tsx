@@ -3,6 +3,7 @@
 
 import CameraView from "./CameraView";
 import { Categories, Faq, Measured, RackFunnel, Roadmap, UseCases, WhatToCheck, WhyAlmost } from "./Offering";
+import ProductVideo from "./ProductVideo";
 import Reveal from "./Reveal";
 import { Badge, Section } from "./Section";
 
@@ -80,8 +81,8 @@ export default function Landing() {
               <a href="#try" className="btn-primary">
                 Try it on a day of footage <span aria-hidden>→</span>
               </a>
-              <a href="#how" className="btn-ghost">
-                See how it works
+              <a href="#video" className="btn-ghost">
+                <span aria-hidden>▶</span> Watch it work
               </a>
             </div>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-4">
@@ -119,6 +120,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <ProductVideo />
 
       {/* What sales data can't see */}
       <Section id="gap" eyebrow="What sales data can't see" title={<>Your POS shows what sold.<br /><span className="text-muted">Not what nearly did.</span></>}>

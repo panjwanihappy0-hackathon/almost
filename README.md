@@ -74,6 +74,16 @@ Unsent events wait on the laptop and go out in order, with their real times, whe
 
 **Limits, honestly**: recognition works best on a small set of products that look clearly different, photographed in the store's own light. Look-alike colours need more photos. Garment sizes can't be read. A ceiling CCTV camera is usually too far away to see what's in a hand.
 
+## Product video
+
+The homepage's "See it work" video (`public/video/almost-demo.mp4` and its poster `.jpg`) is an animation, not real footage: a shopper picks up a product, the camera tags it, the screen switches to it, a comparison, a put-back, then the sample day's funnel. It's drawn by `scripts/render_demo_video.py` from the same garment shapes and catalog as the site, so re-render it after changing products or numbers:
+
+```bash
+.venv\Scripts\pip install pillow imageio-ffmpeg
+.venv\Scripts\python scripts/render_demo_video.py --fonts path\to\fonts        # folder with Manrope.ttf and Inter.ttf
+.venv\Scripts\python scripts/render_demo_video.py --fonts path\to\fonts --preview 6 11 21   # stills in output/, to check a change
+```
+
 ## Set up for your store
 
 - `data/rack-map.json`: which SKUs sit on which rack (the current one is a sample).
